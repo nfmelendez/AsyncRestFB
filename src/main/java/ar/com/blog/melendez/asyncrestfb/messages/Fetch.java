@@ -1,4 +1,4 @@
-package ar.com.blog.melendez.asyncrestfb;
+package ar.com.blog.melendez.asyncrestfb.messages;
 
 import java.io.Serializable;
 

@@ -10,6 +10,8 @@ import com.restfb.WebRequestor;
 import com.restfb.types.Page;
 
 import akka.actor.UntypedActor;
+import ar.com.blog.melendez.asyncrestfb.messages.Block;
+import ar.com.blog.melendez.asyncrestfb.messages.Fetch;
 
 public class FacebookFetchActor extends UntypedActor {
 
@@ -27,9 +29,13 @@ public class FacebookFetchActor extends UntypedActor {
 			FacebookClient c = new DefaultFacebookClient(null, proxy,
 					new DefaultJsonMapper());
 
-			
-			Page page = c.fetchObject("cocacola", Page.class);
-			System.out.println(page.toString());
+			try {
+				Page page = c.fetchObject("cocacola", Page.class);
+				System.out.println(page.toString());
+			} catch (com.restfb.exception.FacebookOAuthException fbException) {
+				this.getContext().actorFor("akka://MySystem/user/Cordinator")
+						.tell(new Block());
+			}
 
 		}
 	}

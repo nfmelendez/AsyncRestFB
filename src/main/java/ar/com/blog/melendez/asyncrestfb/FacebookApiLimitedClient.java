@@ -9,6 +9,7 @@ import akka.dispatch.Future;
 import akka.pattern.Patterns;
 import akka.util.Duration;
 import akka.util.Timeout;
+import ar.com.blog.melendez.asyncrestfb.messages.Cordinate;
 
 import com.restfb.WebRequestor;
 
@@ -30,12 +31,8 @@ public class FacebookApiLimitedClient implements InvocationHandler {
 		Future<Object> future = Patterns.ask(cordinator, new Cordinate(),
 				timeout);
 		String result = (String) Await.result(future, timeout.duration());
-		try {
 			return method.invoke(proxied, args);
-		} catch (com.restfb.exception.FacebookOAuthException fbException) {
-			fbException.printStackTrace();
-			return null;
-		}
+
 	}
 
 }
