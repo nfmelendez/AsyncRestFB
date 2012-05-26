@@ -10,14 +10,14 @@ import akka.pattern.Patterns;
 import akka.util.Duration;
 import akka.util.Timeout;
 
-import com.restfb.FacebookClient;
+import com.restfb.WebRequestor;
 
 public class FacebookApiLimitedClient implements InvocationHandler {
 
-	private final FacebookClient proxied;
+	private final WebRequestor proxied;
 	private final ActorRef cordinator;
 
-	public FacebookApiLimitedClient(FacebookClient proxied, ActorRef actorRef) {
+	public FacebookApiLimitedClient(WebRequestor proxied, ActorRef actorRef) {
 		this.proxied = proxied;
 		this.cordinator = actorRef;
 	}
@@ -30,8 +30,12 @@ public class FacebookApiLimitedClient implements InvocationHandler {
 		Future<Object> future = Patterns.ask(cordinator, new Cordinate(),
 				timeout);
 		String result = (String) Await.result(future, timeout.duration());
-
-		return method.invoke(proxied, args);
+		try {
+			return method.invoke(proxied, args);
+		} catch (com.restfb.exception.FacebookOAuthException fbException) {
+			fbException.printStackTrace();
+			return null;
+		}
 	}
 
 }

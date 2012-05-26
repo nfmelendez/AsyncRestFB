@@ -12,7 +12,7 @@ public class Cordinator extends UntypedActor {
 
 	private static int MAX_BUCKET = 600;
 
-	private int bucket = 100;
+	private int bucket = 0;
 
 	public void onReceive(Object message) throws Exception {
 

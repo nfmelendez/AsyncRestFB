@@ -17,7 +17,7 @@ import akka.util.Duration;
  * Hello world!
  * 
  */
-public class App {
+public class Main {
 	public static void main(String[] args) {
 		ActorSystem system = ActorSystem.create("MySystem");
 
@@ -36,7 +36,7 @@ public class App {
 					}
 				}).withRouter(new RoundRobinRouter(1)), Cordinator.class.getSimpleName());
 		
-	    Cancellable cancellable = system.scheduler().schedule(Duration.Zero(), Duration.create(200, TimeUnit.MILLISECONDS),
+	    Cancellable cancellable = system.scheduler().schedule(Duration.Zero(), Duration.create(10, TimeUnit.MILLISECONDS),
 	            cordinator, new Token());
 
 		for (int i = 0; i < 1000000; i++) {
