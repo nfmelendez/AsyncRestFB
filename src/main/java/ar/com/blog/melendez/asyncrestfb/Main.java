@@ -7,6 +7,8 @@ import akka.actor.Scheduler;
 import akka.actor.UntypedActor;
 import akka.actor.UntypedActorFactory;
 import akka.routing.RoundRobinRouter;
+import ar.com.blog.melendez.asyncrestfb.actor.Cordinator;
+import ar.com.blog.melendez.asyncrestfb.actor.FacebookFetchActor;
 import ar.com.blog.melendez.asyncrestfb.messages.Fetch;
 
 /**

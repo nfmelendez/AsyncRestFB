@@ -1,4 +1,4 @@
-package ar.com.blog.melendez.asyncrestfb;
+package ar.com.blog.melendez.asyncrestfb.actor;
 
 import java.lang.reflect.Proxy;
 
@@ -11,6 +11,7 @@ import com.restfb.types.Page;
 
 import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
+import ar.com.blog.melendez.asyncrestfb.FacebookApiLimitedClient;
 import ar.com.blog.melendez.asyncrestfb.messages.Block;
 import ar.com.blog.melendez.asyncrestfb.messages.Fetch;
 

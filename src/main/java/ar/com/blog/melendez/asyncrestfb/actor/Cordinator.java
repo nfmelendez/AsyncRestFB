@@ -1,4 +1,4 @@
-package ar.com.blog.melendez.asyncrestfb;
+package ar.com.blog.melendez.asyncrestfb.actor;
 
 import java.util.Date;
 import java.util.LinkedList;
