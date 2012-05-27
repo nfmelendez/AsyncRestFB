@@ -9,6 +9,7 @@ import com.restfb.FacebookClient;
 import com.restfb.WebRequestor;
 import com.restfb.types.Page;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import ar.com.blog.melendez.asyncrestfb.messages.Block;
 import ar.com.blog.melendez.asyncrestfb.messages.Fetch;
@@ -18,23 +19,30 @@ public class FacebookFetchActor extends UntypedActor {
 	public void onReceive(Object message) throws Exception {
 
 		if (message instanceof Fetch) {
-			Fetch f = (Fetch) message;
-			WebRequestor defaultWebRequestor = new DefaultWebRequestor();
-			WebRequestor proxy = (WebRequestor) Proxy.newProxyInstance(
-					FacebookFetchActor.class.getClassLoader(),
-					new Class[] { WebRequestor.class },
-					new FacebookApiLimitedClient(defaultWebRequestor, f
-							.getCordinator()));
+			ActorRef cordinator = this.getContext().actorFor(
+					"akka://MySystem/user/Cordinator");
 
-			FacebookClient c = new DefaultFacebookClient(null, proxy,
-					new DefaultJsonMapper());
+			WebRequestor defaultWebRequestor = new DefaultWebRequestor();
+			ClassLoader classLoader = FacebookFetchActor.class.getClassLoader();
+			FacebookApiLimitedClient facebookApiLimitedClientImpl = new FacebookApiLimitedClient(
+					defaultWebRequestor, cordinator);
+
+			Class[] classesArray = new Class[] { WebRequestor.class };
+
+			WebRequestor WebRequestorProxy = (WebRequestor) Proxy
+					.newProxyInstance(classLoader, classesArray,
+							facebookApiLimitedClientImpl);
+
+			DefaultJsonMapper jsonMapper = new DefaultJsonMapper();
+			FacebookClient c = new DefaultFacebookClient(null,
+					WebRequestorProxy, jsonMapper);
 
 			try {
 				Page page = c.fetchObject("cocacola", Page.class);
 				System.out.println(page.toString());
 			} catch (com.restfb.exception.FacebookOAuthException fbException) {
-				this.getContext().actorFor("akka://MySystem/user/Cordinator")
-						.tell(new Block());
+				fbException.printStackTrace();
+				cordinator.tell(new Block());
 			}
 
 		}

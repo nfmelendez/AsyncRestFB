@@ -34,7 +34,7 @@ public class Main {
 				}).withRouter(new RoundRobinRouter(1)), Cordinator.class.getSimpleName());
 		
 		for (int i = 0; i < 1000000; i++) {
-			resourceFetcher.tell(new Fetch(cordinator));
+			resourceFetcher.tell(new Fetch());
 		}
 		System.out.println("FINAL");
 	}
