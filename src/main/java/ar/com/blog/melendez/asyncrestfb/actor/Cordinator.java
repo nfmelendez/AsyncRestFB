@@ -1,11 +1,19 @@
 package ar.com.blog.melendez.asyncrestfb.actor;
 
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
 
 import akka.actor.ActorRef;
 import akka.actor.Cancellable;
@@ -18,9 +26,24 @@ import ar.com.blog.melendez.asyncrestfb.messages.Cordinate;
 import ar.com.blog.melendez.asyncrestfb.messages.Token;
 
 public class Cordinator extends UntypedActor {
-	
-	
-	 private static Logger log = Logger.getLogger(Cordinator.class);
+
+	private static DBCollection withoutToken = null;
+
+	{
+		Mongo mongo = null;
+		DB db = null;
+		try {
+			mongo = new Mongo();
+			db = mongo.getDB("facebookLimits");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (MongoException e) {
+			e.printStackTrace();
+		}
+		withoutToken = db.getCollection("withoutToken");
+	}
+
+	private static Logger log = Logger.getLogger(Cordinator.class);
 
 	Queue<ActorRef> queue = new LinkedList<ActorRef>();
 
@@ -35,6 +58,7 @@ public class Cordinator extends UntypedActor {
 	private int maxWaitTime;
 
 	public Cordinator(Scheduler scheduler) {
+
 		long rate = this.calculateRate();
 		cancellable = scheduler.schedule(
 				Duration.create(maxWaitTime, TimeUnit.MINUTES),
@@ -50,8 +74,13 @@ public class Cordinator extends UntypedActor {
 	public void onReceive(Object message) throws Exception {
 
 		if (message instanceof Audit) {
-			log.info("Max api calls per minute: "
-					+ maxAPICallsPerMinute);
+			DateTime dateTime = new DateTime();
+			String date = dateTime.toString("YYYY-MM-dd-HH");
+			BasicDBObject query = new BasicDBObject();
+			query.put("_id", date);
+			query.put("maxApiCallPerMinute", maxAPICallsPerMinute);
+			withoutToken.insert(query);
+			log.info("Max api calls per minute: " + maxAPICallsPerMinute);
 		}
 
 		if (message instanceof Block) {
