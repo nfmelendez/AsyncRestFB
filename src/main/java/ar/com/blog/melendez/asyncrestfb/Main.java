@@ -1,5 +1,9 @@
 package ar.com.blog.melendez.asyncrestfb;
 
+
+
+import org.apache.log4j.Logger;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
@@ -16,8 +20,14 @@ import ar.com.blog.melendez.asyncrestfb.messages.Fetch;
  * 
  */
 public class Main {
+	public static final String SYSTEM_NAME = "AsyncRestFB";
+	
+	
+	private static final Logger log = Logger.getLogger(Main.class);
+
 	public static void main(String[] args) {
-		ActorSystem system = ActorSystem.create("MySystem");
+		log.info("log");
+		ActorSystem system = ActorSystem.create(SYSTEM_NAME);
 
 		// Metadata persistence actor
 		final ActorRef resourceFetcher = system.actorOf(new Props(
