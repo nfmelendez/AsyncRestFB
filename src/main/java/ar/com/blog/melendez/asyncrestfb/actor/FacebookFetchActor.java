@@ -1,6 +1,7 @@
 package ar.com.blog.melendez.asyncrestfb.actor;
 
 import java.lang.reflect.Proxy;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -40,17 +41,25 @@ public class FacebookFetchActor extends UntypedActor {
 							facebookApiLimitedClientImpl);
 
 			DefaultJsonMapper jsonMapper = new DefaultJsonMapper();
-			FacebookClient c = new DefaultFacebookClient(null,
+			
+			
+			
+			Fetch fetchMessage = (Fetch) message;
+			FacebookClient c = new DefaultFacebookClient(fetchMessage.getProp().getProperty("token"),
 					WebRequestorProxy, jsonMapper);
-
 			try {
-				Page page = c.fetchObject("cocacola", Page.class);
-				log.info(page.toString());
+				fetch(c,fetchMessage.getProp());
 			} catch (com.restfb.exception.FacebookOAuthException fbException) {
 				fbException.printStackTrace();
 				cordinator.tell(new Block());
 			}
 
 		}
+	}
+
+
+	public void fetch(FacebookClient facebookClient, Properties properties) {
+		Page page = facebookClient.fetchObject("cocacola", Page.class);
+		log.info(page.toString());
 	}
 }

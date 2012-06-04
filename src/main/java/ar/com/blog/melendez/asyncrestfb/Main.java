@@ -27,8 +27,10 @@ public class Main {
 
 	public static void main(String[] args) {
 		log.info("log");
-		ActorSystem system = ActorSystem.create(SYSTEM_NAME);
+		ActorSystem system = init();
 
+		
+		
 		// Metadata persistence actor
 		final ActorRef resourceFetcher = system.actorOf(new Props(
 				new UntypedActorFactory() {
@@ -36,7 +38,14 @@ public class Main {
 						return new FacebookFetchActor();
 					}
 				}).withRouter(new RoundRobinRouter(10)), FacebookFetchActor.class.getName());
-		
+		for (int i = 0; i < 1000000; i++) {
+			resourceFetcher.tell(new Fetch());
+		}
+		System.out.println("FINAL");
+	}
+
+	public static ActorSystem init() {
+		ActorSystem system = ActorSystem.create(SYSTEM_NAME);		
 		final Scheduler scheduler = system.scheduler();
 		final ActorRef cordinator = system.actorOf(new Props(
 				new UntypedActorFactory() {
@@ -44,10 +53,6 @@ public class Main {
 						return new Cordinator(scheduler);
 					}
 				}).withRouter(new RoundRobinRouter(1)), Cordinator.class.getSimpleName());
-		
-		for (int i = 0; i < 1000000; i++) {
-			resourceFetcher.tell(new Fetch());
-		}
-		System.out.println("FINAL");
+		return system;
 	}
 }

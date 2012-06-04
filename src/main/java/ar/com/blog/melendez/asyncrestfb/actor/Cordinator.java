@@ -47,7 +47,7 @@ public class Cordinator extends UntypedActor {
 
 	Queue<ActorRef> queue = new LinkedList<ActorRef>();
 
-	private int maxAPICallsPerMinute = 100;
+	private int maxAPICallsPerMinute = 60; // 600 api calls per 600 seg.
 
 	private int bucket = 0;
 
